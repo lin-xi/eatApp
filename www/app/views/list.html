@@ -1,0 +1,27 @@
+<div ng-controller="ListController">
+	<div class="list-head">
+		<input ng-model="keyword" placeholder="请输入关键字"/><a class="btn small add-btn" ng-click="doAdd()">添加</a>
+	</div>
+	<ul class="list-panel">
+		<li ng-repeat="item in restaurant | filter:keyword">
+			<span><i class="icon-pictures2"></i></span>
+			<span>{{item.name}}</span>
+			<span><i class="star-{{item.star}}"></i></span>
+			<span><i class="icon-trash" ng-click="doDelete(item.id)"></i></span>
+		</li>
+	</ul>
+
+
+	<div ng-show="showAdd" class="add-panel">
+		<form novalidate class="css-form">
+			<h2>添加餐厅</h2>
+			<hr>
+			名称：<input id="name" placeholder="名称" ng-model="name" required/><br>
+			评价：<input type="number" min="0" max="5" id="star" placeholder="星级" ng-model="star" required/><br>
+			<hr>
+			<button class="btn" ng-click="doSave()">确定</button>
+			<button class="btn" ng-click="doBack()">取消</button>
+		</form>
+	</div>
+
+</div>

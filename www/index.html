@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html ng-app="eatApp">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"/>
+        <link rel="stylesheet" type="text/css" href="css/icon.css" />
+        <title>吃什么?</title>
+		
+		<style type="text/css">
+			html, body{margin:0; padding:0; width:100%; height:100%; font-family:"微软雅黑"; font-size:18px;}
+			i{display:inline-block; width:32px; height:32px; font-size:32px; color:#fff;}
+			i:hover{color:#444; cursor: pointer;}
+			ul,li{margin:0; padding:0; list-style:none}
+			a{color:#000; text-decoration: none; cursor: pointer;}
+			
+			#main{width:100%; height: 100%; background-color: #666;}
+			#header{width: 100%; height: 50px;}
+			#body{position:relative; width: 100%; overflow-y: auto; -webkit-perspective:1000;}
+
+			.nav{width:100%; height:50px; line-height:50px; background-color: #F35D5D; display: -webkit-box; -webkit-box-orient: horizontal;}
+			.nav .left{width:40px; height:32px;}
+			.nav .left img{margin-top:7px; margin-left:5px;}
+			.nav .center{-webkit-box-flex: 1; font-size:20px; font-weight:bold; color:#fff; text-align:center;}
+			.nav .right{width:40px; height:32px;}
+			.nav .right i{margin-top:9px;}
+
+			.menu{position: absolute; top:50px; right:0; width: 50%; box-shadow: 0 0 10px #666; z-index: 200;}
+			.menu li{height: 50px; line-height: 50px; background-color: #f0f0f0; padding-left: 10px;}
+			.menu li a{display: block; width: 100%;}
+			.menu li:hover{background-color: #E0E0E0; cursor: pointer;}
+			.menu i{color:#888; vertical-align: middle; font-size: 26px;}
+			
+			.turntable{width:100%; height:400px; position:relative; z-index:100}
+			.plate{width:300px; height:400px; background:url(css/img/plate.png) center center no-repeat; margin:0 auto;}
+			.spoon{position:absolute; left:50%; top:200px; width:200px; height:54px; margin-top:-27px; margin-left: -20px; background:url(css/img/spoon.png) no-repeat; cursor: pointer;}
+			
+			.screen{position:relative; border:1px #ccc solid; width:320px; height:120px; border-radius:10px; margin:0 auto; overflow:hidden; box-shadow: inset 0 0 10px #999; background-color:#F5F5F5; z-index:101}
+			
+			.box{width: 260px; height: 80px; position: relative; -webkit-perspective: 1200; margin: 20px auto; }
+			.box .spin{width: 100%; height: 100%; position: absolute; -webkit-transform-style: preserve-3d; }
+			.box .face{position: absolute; text-align:center; font-size: 24px; background-color: #fff; height: 80; line-height: 80px; width: 100%; border: 1px #ccc solid;}
+			
+			.cog1{position:absolute; left:50%; margin-left: -74px; top:350px; width:100px; height:100px; background: url(css/img/cog1.png); z-index:2;}
+			.cog2{position:absolute; left:50%; margin-left: 0px; top:290px; width:100px; height:100px; background: url(css/img/cog3.png); z-index:2;}
+			.cog-mask{position:absolute; left:50%; margin-left:-150px; top:290px; width:300px; height:180px; z-index:3; background-color:#fff; opacity:1;}
+			
+			.round1 { 
+				width:300px; height:300px; border-radius: 100%;
+				position:absolute; left:50%; top:50px;
+				margin-left: -150px; background:#88c;
+				box-sizing:border-box; z-index: 80;
+			}
+			.wrapper { 
+				width:300px; height:300px; position:absolute;
+				left:50%; top:50px;
+				margin-left: -150px;
+				background:white;
+				box-sizing:border-box;
+			}
+
+			.pie {
+				width: 50%; height: 100%;
+				-webkit-transform-origin: 100% 50%;
+				position: absolute;
+				background: -webkit-radial-gradient(left center, circle, #0cf 0px, #008 100%);
+				/* The borders mustn't be transparent, that looks really ugly! */
+				border: 20px solid #88c;
+				box-sizing:border-box;
+			}
+
+			.spinner {
+				border-radius: 100% 0 0 100% / 50% 0 0 50%;
+				z-index: 20;
+				background: -webkit-radial-gradient(right center, circle, #0cf 0px, #008 100%);
+				border-right:none;
+				-webkit-animation: rota 5s linear 1;
+			}
+
+			.wrapper:hover {
+				.pie {border-color: #620;}
+				.filler {background: -webkit-radial-gradient(left center, circle, #fb1 0px, #d60 100%);}
+				.spinner {background: -webkit-radial-gradient(right center, circle, #fb1 0px, #d60 100%);}
+			}
+			.filler {
+				border-radius: 0 100% 100% 0 / 0 50% 50% 0; 
+				left: 50%; opacity: 0; z-index: 10;
+				-webkit-animation: fill 5s steps(1, end) 1;
+				border-left: none;
+			}
+			.mask {
+				width: 50%; height: 100%; position: absolute;
+				background: inherit; opacity: 1; z-index: 30;
+				-webkit-animation: mask 5s steps(1, end) 1;
+			}
+
+			@-webkit-keyframes rota {
+				0% { -webkit-transform: rotate(0deg); }
+				100% { -webkit-transform: rotate(360deg); }
+			}
+
+			@-webkit-keyframes mask {
+				0% { opacity: 1; }
+				50% { opacity: 0; }
+				100% { opacity: 0; }
+			}
+
+			@-webkit-keyframes fill {
+				0% { opacity: 0; }
+				50% { opacity: 1; }
+				100% { opacity: 1; }
+			}
+
+			.add-panel{position: absolute; top:0px; left: 0; width: 100%; height: 100%; background-color: #fff; overflow: hidden; text-align: center;}
+			.add-panel input{width: 80%; height: 40px; margin-bottom: 10px;}
+			.add-panel hr{border-top:#eee 1px solid; border-bottom: 1px #F9F9F9 solid; margin-top: 10px; margin-bottom: 20px; border-left: none; border-right: none;}
+			
+			.btn {
+				background: #3498db;
+				background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+				background-image: linear-gradient(to bottom, #3498db, #2980b9);
+				border-radius: 28px;
+				color: #ffffff;
+				font-size: 20px;
+				padding: 10px 35px 10px 35px;
+				text-decoration: none;
+				text-shadow:0px -1px 0px #5b6178;
+				border: none;
+			}
+			.btn:hover {
+				background: #3cb0fd;
+				background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+				background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+				text-decoration: none; cursor:pointer;
+			}
+			.btn:active {
+				position:relative;
+				top:1px;
+			}
+			.small{padding: 6px 35px 6px 35px;}
+
+			.list-head{ background-color: #f0f0f0; height: 70px; line-height: 70px;}
+			.list-head input{width: 40%; height: 40px; border-radius: 20px; border: 1px #ccc solid; padding:0 20px; margin-left: 10px; color: #444;}
+			.list-head .add-btn{float: right; line-height: 1.2; margin: 15px 10px 0 0;}
+
+			.list-panel{width: 100%; background-color: #fff;}
+			.list-panel li{height: 60px; line-height: 60px; display: -webkit-box; width: 100%; overflow: hidden;}
+			.list-panel li:nth-child(even){background-color: #EFF1F0;}
+			.list-panel li span{vertical-align: middle; display: block; height: 50px;}
+			.list-panel li span:nth-child(1){width: 40px; text-align: center;}
+			.list-panel li span:nth-child(2){-webkit-box-flex:1; overflow: hidden;}
+			.list-panel li span:nth-child(3){width: 80px;}
+			.list-panel li span:nth-child(4){width: 30px;}
+			.list-panel li i{vertical-align: middle; color: #999; font-size: 26px;}
+			
+
+			.star-1:after,.star-2:after, .star-3:after, .star-4:after, .star-5:after{
+				font-style:normal; font-size: 16px; position: relative; top:-15px; color: #f55;
+			}
+			.star-1:after{content:'★';}
+			.star-2:after{content:'★★';}
+			.star-3:after{content:'★★★';}
+			.star-4:after{content:'★★★★';}
+			.star-5:after{content:'★★★★★';}
+
+			.css-form input.ng-invalid.ng-dirty{background-color: #FA787E;}
+			.css-form input.ng-valid.ng-dirty{background-color: #78FA89;}
+			
+			.reveal-animation{width: 100%; height: 100%; background-color: #fff; -webkit-transform-style:  preserve-3d;}
+			.reveal-animation.ng-enter{
+			    -webkit-transition: 800ms ease all;
+			    position: absolute;
+			    -webkit-transform: rotateY(-90deg); 
+			    -webkit-transform-origin: 100% 50%;
+			    opacity: 0;
+			}
+			.reveal-animation.ng-enter-active{
+				-webkit-transform: rotateY(0deg); 
+				opacity: 1;
+			}
+			
+			.reveal-animation.ng-leave{
+			    -webkit-transition: 800ms ease all;
+			    position: absolute;
+			    -webkit-transform: rotateY(0deg); 
+			    -webkit-transform-origin: 0% 50%;
+			    opacity: 1;
+			}
+			.reveal-animation.ng-leave-active {
+			    -webkit-transform: rotateY(90deg);
+			    opacity: 0;
+			}
+			
+			.dialog-mask{position:absolute; left:0; top:0; width:100%; height:400px; z-index:300; background-color: #fff; opacity: 0.8}
+			.dialog{position: absolute; width: 60%; font-size: 30px; padding: 30px 0;  text-align: center; top:50%; left: 50%; margin-left: -30%; margin-top: -100px; border: 2px #ccc solid; border-radius: 20px; background-color: #ccc; color:#fff; box-shadow: 0 0 20px #000;}
+		</style>
+    </head>
+    <body>
+
+    	<div id="main">
+	   		<div id="header">
+	   			<app-header></app-header>
+	   		</div>
+	        <div id="body">
+	        	<div ng-view class="reveal-animation" style="height:100%"></div>
+	        </div>
+		</div>
+        
+        <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+        <script type="text/javascript" src="js/jquery.transit.js"></script>
+        <script type="text/javascript" src="js/jquery.touch.js"></script>
+		
+        <script type="text/javascript" src="cordova.js"></script>
+
+        <script type="text/javascript" src="js/angular.js"></script>
+        <script type="text/javascript" src="js/angular-loader.js"></script>
+        <script type="text/javascript" src="js/angular-route.js"></script>
+        <script type="text/javascript" src="js/angular-touch.js"></script>
+        <script type="text/javascript" src="js/angular-sanitize.js"></script>
+        <script type="text/javascript" src="js/angular-animate.js"></script>
+		
+        <script type="text/javascript" src="app/app.js"></script>
+        <script type="text/javascript" src="app/controllers/controllers.js"></script>
+        <script type="text/javascript" src="app/directives/turnTable.js"></script>
+        <script type="text/javascript" src="app/directives/appHeader.js"></script>
+        <script type="text/javascript" src="app/services/dbService.js"></script>
+        <script type="text/javascript" src="app/services/restaurantService.js"></script>
+    
+        <script type="text/javascript">
+        	document.getElementById('body').style.height = document.body.clientHeight-50 + 'px';
+        	document.addEventListener("backbutton", function(e){
+        		var path = location.href.match(/#\/(\w+)$/)[1];
+        		if(path != "index"){
+        			location.href = location.href.replace(/#\/\w+$/, '#/index');
+        			e.preventDefault();
+        			e.stopPropagation();
+        		} else {
+        			navigator.notification.confirm('您确认退出程序吗？', function(buttonIndex){
+        				if(buttonIndex == 1){
+        					navigator.app.exitApp();
+        				}
+        			}, '确认', ['确定', '取消']);
+        		}
+        	}, false);
+        </script>
+
+    </body>
+</html>
