@@ -5,9 +5,13 @@ app.directive('turnTable', function($document, $window, $route) {
 
         var cenX = 200, cenY = 250;
         var touchTime = 0, posX=0, posY=0;
-        var degree = 0;
-        var finish = false;
+        var degree = 0, time = 0;
+        var finish = false, running = false;
+        scope.showAlert = false;
 
+        jQuery('.spoon').css({ '-webkit-transform-origin': '20px 27px', '-webkit-transform': 'rotate(0deg)'});
+
+        /*
         jQuery('.spoon').off();
         jQuery('.spoon').enableTouch({
             useMouse:           true,   // If true, mouse clicks and movements will also trigger
@@ -17,41 +21,36 @@ app.directive('turnTable', function($document, $window, $route) {
             tapDelay:           250,    // sensitive, higher = less sensitive) Delay between taps
             tapAndHoldDelay:    750     // Time to wait before triggering "tapAndHold"
         }).on('swipeUp', function(){
-            touchTime = new Date() - touchTime;
-            jQuery('.wrapper').remove();
-            posX>cenX ? turn(1):turn(-1);
+            
 
         }).on('swipeDown', function(){
             touchTime = new Date() - touchTime;
             jQuery('.wrapper').remove();
-            posX>cenX ? turn(-1):turn(1);
+            turn(-1);
 
-        }).on('swipeLeft', function(){
-            touchTime = new Date() - touchTime;
-            jQuery('.wrapper').remove();
-            posY>cenY ? turn(-1):turn(1);
+        })
+        */
+        if(!running){
+            element.find('.spoon').on('touchstart', function(e){
+                running = true;
+                touchTime = new Date()-0;
+                element.append('<div class="wrapper"><div class="pie spinner"></div><div class="pie filler"></div><div class="mask"></div></div>');
 
-        }).on('swipeRight', function(){
-            touchTime = new Date() - touchTime;
-            jQuery('.wrapper').remove();
-            posY>cenY ? turn(1):turn(-1);
-
-        }).on('touchstart', function(e){
-            touchTime = new Date()-0;
-            element.append('<div class="wrapper"><div class="pie spinner"></div><div class="pie filler"></div><div class="mask"></div></div>');
-
-            element.find('.spinner').on('webkitAnimationEnd', function(e){
-                scope.$apply(function(){
-                    scope.forceHtml = '<div class="round1"></div>';
+                element.find('.spinner').on('webkitAnimationEnd', function(e){
+                    scope.$apply(function(){
+                        scope.forceHtml = '<div class="round1"></div>';
+                    });
                 });
+            }).on('touchend', function(){
+                touchTime = new Date() - touchTime;
+                jQuery('.wrapper').remove();
+            }).on('touchmove', function(e){
+                running = true;
+                touchTime = new Date() - touchTime;
+                jQuery('.wrapper').remove();
+                turn(1);
             });
-
-            posX = e.x;
-            posY = e.y;
-        }).on('touchend', function(){
-            touchTime = new Date() - touchTime;
-            jQuery('.wrapper').remove();
-        });
+        }
 
         function waitfor(condition, fn){
             var requestAnimationFrame = window.requestAnimationFrame || function(func){setTimeout(func, 10);};
@@ -87,13 +86,14 @@ app.directive('turnTable', function($document, $window, $route) {
         jQuery('body').on('click', function(){
             if(finish){
                 finish = false;
-                jQuery('.spoon').removeAttr('style');
-                jQuery('.cog1').removeAttr('style');
-                jQuery('.cog2').removeAttr('style');
-                jQuery('.cog-mask').removeAttr('style');
-                jQuery('.spin').removeAttr('style');
+                jQuery('.spoon').attr('style', '');
+                jQuery('.cog1').attr('style', '');
+                jQuery('.cog2').attr('style', '');
+                jQuery('.cog-mask').attr('style', '');
+                jQuery('.spin').attr('style', '');
                 degree=0;
                 touchTime=0;
+
                 scope.$apply(function(){
                     scope.showAlert = false;
                 });
@@ -108,31 +108,24 @@ app.directive('turnTable', function($document, $window, $route) {
             var deg = modulus*degree;
             var time = Math.ceil(de/360)*2000;
 
-            jQuery('.spoon').css({ transformOrigin: '20px 50%'})
-            .transition({rotate: deg+'deg'}, time, 'cubic-bezier(0,0.3,0.3,1)', function(){
-                //jQuery(this).removeAttr('style');
-            }, function(host){
-            });
-                
-            jQuery('.cog1').css({ transformOrigin: '50% 50%'})
-            .transition({rotate: -deg+'deg'}, time, 'cubic-bezier(0,0.3,0.3,1)', function(){
-                //jQuery(this).removeAttr('style');
-            });
-                
-            jQuery('.cog-mask')
-            .transition({opacity: 0}, time/2)
-            .transition({opacity: 1}, time/2);
+            jQuery('.spoon').css({'-webkit-transition': 'all '+time+'ms cubic-bezier(0,0.3,0.3,1)', '-webkit-transform-origin': '20px 27px', '-webkit-transform': 'rotate('+deg+'deg)'});
+            jQuery('.cog1').css({'-webkit-transition': 'all '+time+'ms cubic-bezier(0,0.3,0.3,1)', '-webkit-transform-origin': '50% 50%', '-webkit-transform': 'rotate(-'+deg+'deg)'});
+            jQuery('.cog2').css({'-webkit-transition': 'all '+time+'ms cubic-bezier(0,0.3,0.3,1)', '-webkit-transform-origin': '50% 50%', '-webkit-transform': 'rotate('+deg+'deg)'});
+            jQuery('.cog-mask').css({'-webkit-transition': 'all '+time/2+'ms cubic-bezier(0,0.3,0.3,1)', opacity: 0});
+            jQuery('.spin').css({'-webkit-transition': 'all '+time+'ms cubic-bezier(0,0.3,0.3,1)', '-webkit-transform': 'rotateX('+deg+'deg)'});
+
+            setTimeout(function(){
+                jQuery('.cog-mask').css({'-webkit-transition': 'all '+time/2+'ms cubic-bezier(0,0.3,0.3,1)', opacity: 1});
+            }, time/2);
             
-            jQuery('.cog2').css({ transformOrigin: '50% 50%'})
-            .transition({rotate: deg+'deg'}, time, 'cubic-bezier(0,0.3,0.3,1)', function(){
-                //jQuery(this).removeAttr('style');
-            });
-            jQuery('.spin').transition({rotateX : deg+'deg'}, time, 'cubic-bezier(0,0.3,0.3,1)', function(){
+            jQuery('.spin').on('webkitTransitionEnd', function(){
                 scope.$apply(function(){
-                    finish = true;
                     scope.showAlert = true;
                 });
+                finish = true;
+                running = false;
             });
+
         }
 
     }

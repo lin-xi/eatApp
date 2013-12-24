@@ -1,4 +1,4 @@
-﻿var app = angular.module('eatApp', ['ngRoute', 'ngSanitize', 'ngAnimate']);
+﻿var app = angular.module('eatApp', ['ngRoute', 'ngSanitize', 'ngAnimate', 'ngTouch']);
 
 //This configures the routes and associates each route with a view and a controller
 app.config(function ($routeProvider) {
