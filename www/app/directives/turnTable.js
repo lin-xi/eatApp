@@ -61,24 +61,6 @@ app.directive('turnTable', function($document, $window, $route) {
             return scope.restaurant != null;
         }, drawCircle);
 
-        jQuery('body').off();
-        jQuery('body').on('click', function(){
-            if(finish){
-                finish = false;
-                jQuery('.spoon').attr('style', '');
-                jQuery('.cog1').attr('style', '');
-                jQuery('.cog2').attr('style', '');
-                jQuery('.cog-mask').attr('style', '');
-                jQuery('.spin').attr('style', '');
-                degree=0;
-                touchTime=0;
-
-                scope.$apply(function(){
-                    scope.showAlert = false;
-                });
-            }
-        });
-
         function turn(modulus){
             var restaurant = scope.restaurant;
 
@@ -103,8 +85,25 @@ app.directive('turnTable', function($document, $window, $route) {
                 });
                 finish = true;
                 running = false;
-            });
 
+                jQuery('body').off();
+                jQuery('body').on('click', function(){
+                    if(finish){
+                        finish = false;
+                        jQuery('.spoon').attr('style', '');
+                        jQuery('.cog1').attr('style', '');
+                        jQuery('.cog2').attr('style', '');
+                        jQuery('.cog-mask').attr('style', '');
+                        jQuery('.spin').attr('style', '');
+                        degree=0;
+                        touchTime=0;
+
+                        scope.$apply(function(){
+                            scope.showAlert = false;
+                        });
+                    }
+                });
+            });
         }
 
     }
