@@ -7,7 +7,6 @@ app.directive('turnTable', function($document, $window, $route) {
         var touchTime = 0, posX=0, posY=0;
         var degree = 0, time = 0;
         var finish = false, running = false, move = false;
-        scope.showAlert = false;
 
         jQuery('.spoon').css({ '-webkit-transform-origin': '20px 27px', '-webkit-transform': 'rotate(0deg)'});
         var agent;
@@ -20,41 +19,61 @@ app.directive('turnTable', function($document, $window, $route) {
         }
 
         element.find('.spoon').on('touchstart', function(e){
-            running = true;
-            touchTime = new Date()-0;
-            element.append('<div class="wrapper"><div class="pie spinner"></div><div class="pie filler"></div><div class="mask"></div></div>');
+            if(!running){
+                touchTime = new Date()-0;
+                element.append('<div class="wrapper"><div class="pie spinner"></div><div class="pie filler"></div><div class="mask"></div></div>');
 
-            element.find('.spinner').on('webkitAnimationEnd', function(e){
-                scope.$apply(function(){
-                    scope.forceHtml = '<div class="round1"></div>';
+                element.find('.spinner').on('webkitAnimationEnd', function(e){
+                    scope.$apply(function(){
+                        scope.forceHtml = '<div class="round1"></div>';
+                    });
                 });
-            });
+            }
         });
+        
+        if(agent == 'android'){
 
-        if(!running){
-            if(agent == 'android'){
-                element.find('.spoon').on('touchmove', function(e){
+            element.find('.spoon').on('touchmove', function(e){
+                if(!running){
                     running = true;
                     touchTime = new Date() - touchTime;
                     jQuery('.wrapper').remove();
                     turn(1);
-                });
+                }
+            }).on('touchend', function(e){
+                jQuery('.wrapper').remove();
+            });
 
-            }else{
-                element.on('touchmove', function(e){
-                    move = true;
-                });
-                element.on('touchend', function(e){
-                    if(running && move){
-                        move = false;
-                        
-                        touchTime = new Date() - touchTime;
-                        jQuery('.wrapper').remove();
-                        turn(1);
-                    }
-                });
-            }
+        }else{
+
+            element.on('touchmove', function(e){
+                move = true;
+            });
+            element.on('touchend', function(e){
+                if(running && move){
+                    move = false;
+
+                    touchTime = new Date() - touchTime;
+                    jQuery('.wrapper').remove();
+                    turn(1);
+                }
+            });
         }
+
+        jQuery('.dialog-mask').on('click', function(){
+            finish = false;
+            jQuery('.spoon').attr('style', '');
+            jQuery('.cog1').attr('style', '');
+            jQuery('.cog2').attr('style', '');
+            jQuery('.cog-mask').attr('style', '');
+            jQuery('.spin').attr('style', '');
+            degree=0;
+            touchTime=0;
+
+            scope.$apply(function(){
+                scope.showAlert = false;
+            });
+        });
 
         function waitfor(condition, fn){
             var requestAnimationFrame = window.requestAnimationFrame || function(func){setTimeout(func, 10);};
@@ -104,34 +123,13 @@ app.directive('turnTable', function($document, $window, $route) {
                 jQuery('.cog-mask').css({'-webkit-transition': 'all '+time/2+'ms cubic-bezier(0,0.3,0.3,1)', opacity: 1});
             }, time/2);
             
-            jQuery('.spin').on('webkitTransitionEnd', function(){
+            jQuery('.spoon').on('webkitTransitionEnd', function(){
                 scope.$apply(function(){
                     scope.showAlert = true;
                 });
                 finish = true;
                 running = false;
-
-                jQuery('body').off();
-                jQuery('body').on('click', function(){
-                    if(finish){
-                        finish = false;
-                        jQuery('.spoon').attr('style', '');
-                        jQuery('.cog1').attr('style', '');
-                        jQuery('.cog2').attr('style', '');
-                        jQuery('.cog-mask').attr('style', '');
-                        jQuery('.spin').attr('style', '');
-                        degree=0;
-                        touchTime=0;
-
-                        scope.$apply(function(){
-                            scope.showAlert = false;
-                        });
-                    }
-                });
             });
-
-
-
 
         }
 
