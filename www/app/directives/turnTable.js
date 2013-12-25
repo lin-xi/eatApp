@@ -6,29 +6,54 @@ app.directive('turnTable', function($document, $window, $route) {
         var cenX = 200, cenY = 250;
         var touchTime = 0, posX=0, posY=0;
         var degree = 0, time = 0;
-        var finish = false, running = false;
+        var finish = false, running = false, move = false;
         scope.showAlert = false;
 
         jQuery('.spoon').css({ '-webkit-transform-origin': '20px 27px', '-webkit-transform': 'rotate(0deg)'});
+        var agent;
+        if( /iPhone|iPad|iPod/i.test(navigator.userAgent.toLowerCase())) {
+            agent = 'ios';
+        }else if( /android/i.test(navigator.userAgent.toLowerCase())) {
+            agent = 'android';
+        }else{
+            agent = 'webkit';
+        }
 
-        
-        if(!running){
-            element.find('.spoon').on('touchstart', function(e){
-                running = true;
-                touchTime = new Date()-0;
-                element.append('<div class="wrapper"><div class="pie spinner"></div><div class="pie filler"></div><div class="mask"></div></div>');
+        element.find('.spoon').on('touchstart', function(e){
+            running = true;
+            touchTime = new Date()-0;
+            element.append('<div class="wrapper"><div class="pie spinner"></div><div class="pie filler"></div><div class="mask"></div></div>');
 
-                element.find('.spinner').on('webkitAnimationEnd', function(e){
-                    scope.$apply(function(){
-                        scope.forceHtml = '<div class="round1"></div>';
-                    });
+            element.find('.spinner').on('webkitAnimationEnd', function(e){
+                scope.$apply(function(){
+                    scope.forceHtml = '<div class="round1"></div>';
                 });
-            }).on('touchmove', function(e){
-                running = true;
-                touchTime = new Date() - touchTime;
-                jQuery('.wrapper').remove();
-                turn(1);
             });
+        });
+
+        if(!running){
+            if(agent == 'android'){
+                element.find('.spoon').on('touchmove', function(e){
+                    running = true;
+                    touchTime = new Date() - touchTime;
+                    jQuery('.wrapper').remove();
+                    turn(1);
+                });
+
+            }else{
+                element.on('touchmove', function(e){
+                    move = true;
+                });
+                element.on('touchend', function(e){
+                    if(running && move){
+                        move = false;
+                        
+                        touchTime = new Date() - touchTime;
+                        jQuery('.wrapper').remove();
+                        turn(1);
+                    }
+                });
+            }
         }
 
         function waitfor(condition, fn){
@@ -104,6 +129,10 @@ app.directive('turnTable', function($document, $window, $route) {
                     }
                 });
             });
+
+
+
+
         }
 
     }
