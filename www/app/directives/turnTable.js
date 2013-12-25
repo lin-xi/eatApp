@@ -11,25 +11,7 @@ app.directive('turnTable', function($document, $window, $route) {
 
         jQuery('.spoon').css({ '-webkit-transform-origin': '20px 27px', '-webkit-transform': 'rotate(0deg)'});
 
-        /*
-        jQuery('.spoon').off();
-        jQuery('.spoon').enableTouch({
-            useMouse:           true,   // If true, mouse clicks and movements will also trigger
-            dragThreshold:      10,     // touch events, Distance from tap to register a drag (lower = more
-            dragDelay:          200,    // sensitive, higher = less sensitive) Time to wait before registering a drag (needs to be high 
-            swipeThreshold:     30,     // enough to not interfere with scrolling)Distance from tap to register a swipe (lower = more 
-            tapDelay:           250,    // sensitive, higher = less sensitive) Delay between taps
-            tapAndHoldDelay:    750     // Time to wait before triggering "tapAndHold"
-        }).on('swipeUp', function(){
-            
-
-        }).on('swipeDown', function(){
-            touchTime = new Date() - touchTime;
-            jQuery('.wrapper').remove();
-            turn(-1);
-
-        })
-        */
+        
         if(!running){
             element.find('.spoon').on('touchstart', function(e){
                 running = true;
@@ -41,9 +23,6 @@ app.directive('turnTable', function($document, $window, $route) {
                         scope.forceHtml = '<div class="round1"></div>';
                     });
                 });
-            }).on('touchend', function(){
-                touchTime = new Date() - touchTime;
-                jQuery('.wrapper').remove();
             }).on('touchmove', function(e){
                 running = true;
                 touchTime = new Date() - touchTime;
