@@ -14,7 +14,7 @@
 	            -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
 	            -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
 	            -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
-	            -webkit-user-select: auto !important;       /* prevent copy paste, to allow, change 'none' to 'text' */
+	            -webkit-user-select: 'text';       /* prevent copy paste, to allow, change 'none' to 'text' */
 		    }
 			html, body{margin:0; padding:0; width:100%; height:100%; font-family:"微软雅黑"; font-size:18px;}
 			i{display:inline-block; width:32px; height:32px; font-size:32px; color:#fff;}
@@ -120,7 +120,7 @@
 			}
 
 			.add-panel{position: absolute; top:0px; left: 0; width: 100%; height: 100%; background-color: #fff; overflow: hidden; text-align: center;}
-			.add-panel input{width: 80%; height: 40px; margin-bottom: 10px;}
+			.add-panel input, .add-panel select{width: 80%; height: 40px; margin-bottom: 10px;}
 			.add-panel hr{border-top:#eee 1px solid; border-bottom: 1px #F9F9F9 solid; margin-top: 10px; margin-bottom: 20px; border-left: none; border-right: none;}
 			
 			.btn {

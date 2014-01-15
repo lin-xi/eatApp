@@ -17,7 +17,7 @@
 			<h2>添加餐厅</h2>
 			<hr>
 			名称：<input id="name" placeholder="名称" ng-model="name" required/><br>
-			评价：<input type="number" min="0" max="5" id="star" placeholder="星级" ng-model="star" required/><br>
+			评价：<select id="star" ng-model="star" ng-options="c.name for c in stars"></select>
 			<hr>
 			<button class="btn" ng-click="doSave()">确定</button>
 			<button class="btn" ng-click="doBack()">取消</button>

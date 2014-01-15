@@ -20,6 +20,13 @@ app.controller('ListController', function ($scope, $location, restaurant) {
 	init();
 	function init(){
 		$scope.showAdd = false;
+		$scope.stars = [
+			{star:1, name:'一星'},
+			{star:2, name:'二星'},
+			{star:3, name:'三星'},
+			{star:4, name:'四星'},
+			{star:5, name:'五星'}
+		];
 		getData();
 
 		function getData(){
@@ -37,7 +44,7 @@ app.controller('ListController', function ($scope, $location, restaurant) {
 			if(!$scope.name || !$scope.star){
 				return;
 			}
-			restaurant.put($scope.name, '', $scope.star, function(){
+			restaurant.put($scope.name, '', $scope.star.star, function(){
 				getData();
 			});
 		};

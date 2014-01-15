@@ -5,7 +5,11 @@ app.directive('appHeader', function() {
 			$scope.showMenu = false;
 
 	        $scope.onMenu = function(e) {
-	        	$scope.showMenu = true;
+                if($scope.showMenu){
+                    $scope.showMenu = false;
+                }else{
+                    $scope.showMenu = true;
+                }
 	        };
 
             $scope.exit = function(){
@@ -21,9 +25,15 @@ app.directive('appHeader', function() {
       		});
 
       		document.addEventListener("menubutton", function(e){
-        		scope.$apply(function(){
-  					scope.showMenu = true;
-  				});
+        		if(scope.showMenu){
+                    scope.$apply(function(){
+      					scope.showMenu = false;
+      				});
+                }else{
+                    scope.$apply(function(){
+                        scope.showMenu = true;
+                    });
+                }
         	}, false);
       	}
 	};
